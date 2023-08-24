@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
 #define RESET_VECTOR 0xfffc
-#define ROM_BASE 0x8000
-#define DELAY_74HC595 5
+#define PICO6502_ROM_BASE 0x8000
+#define DELAY_74HC595 1
 
 //                         A0, A1, A2, A3, A4, A5, A6, A7
 const int addressPins[] = {28, 27, 26, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10};
@@ -32,12 +32,12 @@ void strobeLatchPin(int value) {
 }
 
 void writeDataBit(int value) {
-    digitalWrite(serClkPin, LOW);
-    sleep_ms(DELAY_74HC595);
-    digitalWrite(dataPin, value);
-    sleep_ms(DELAY_74HC595);
-    digitalWrite(serClkPin, HIGH);
-    sleep_ms(DELAY_74HC595);
+  digitalWrite(serClkPin, LOW);
+  sleep_ms(DELAY_74HC595);
+  digitalWrite(dataPin, value);
+  sleep_ms(DELAY_74HC595);
+  digitalWrite(serClkPin, HIGH);
+  sleep_ms(DELAY_74HC595);
 }
 
 void writeDataBus(byte value) {
@@ -65,34 +65,31 @@ word readAddressBus() {
   return value;
 }
 
+bool singleStep = false;
+
 void step() {
+  
+  byte data = 0xFF;
   char addrType[10];
   char buffer[200];
+  // Turn on LED on to indicate we're processing
   digitalWrite(LED_BUILTIN, HIGH);
-
+  // CLK goes LOW
   digitalWrite(clkPin, LOW);
-  sleep_ms(150);
-  bool reading = digitalRead(rwPin);
 
-  // Read address
+  // Read signal pins
+  bool reading = digitalRead(rwPin);
   word address = readAddressBus();
   
-  byte data = 0xEA;
-
+  digitalWrite(ramSelPin, (address < 0x6000) ? LOW : HIGH);
+  digitalWrite(ioSelPin, (address >= 0x6000 && address < 0x8000) ? LOW : HIGH);
+  boolean handle = address >= 0x8000;
   // Where are we reading/writing
-  boolean handle = false;
   if ( address < 0x6000) {
     strcpy(addrType, "RAM");
-    digitalWrite(ramSelPin, LOW);
-    digitalWrite(ioSelPin, HIGH);
   } else if ( address >= 0x6000 && address < 0x8000) {
     strcpy(addrType, "IO ");
-    digitalWrite(ioSelPin, LOW);
-    digitalWrite(ramSelPin, HIGH);
   } else {
-    handle = true;
-    digitalWrite(ramSelPin, HIGH);
-    digitalWrite(ioSelPin, HIGH);
     strcpy(addrType, "ROM");
   }
 
@@ -103,21 +100,20 @@ void step() {
     } else if (address == RESET_VECTOR + 1) {
       data = 0x80;
     } else {
-      data = rom[address-ROM_BASE];
+      data = rom[address-PICO6502_ROM_BASE];
     }
     writeDataBus(data);
   }
 
-  sleep_ms(200);
+  // Set CLK HIGH
   digitalWrite(clkPin, HIGH);
 
-  sleep_ms(150);
-  
+  // Output current status to Serial port  
   sprintf(buffer, "BUS Addr: %s : %4.4X - Data: %2.2X - DIR: %c", addrType, address, data, reading ? 'R' : 'W');
   Serial.println(buffer);
 
+  // Turn off LED
   digitalWrite(LED_BUILTIN, LOW);
-  sleep_ms(500);
 }
 
 
@@ -163,12 +159,20 @@ unsigned char button_checker;
 
 void loop() {
 
-  button_checker <<= 1;     
-  button_checker += digitalRead(stepPin);
-  if ( button_checker == 0x80) {
+  if ( singleStep ) {
+    button_checker <<= 1;     
+    button_checker += digitalRead(stepPin);
+    if ( button_checker == 0x80) {
+      step();
+    }
+  } else {
     step();
   }
 
+}
+
+void setup1() {
+  
 }
 
 
