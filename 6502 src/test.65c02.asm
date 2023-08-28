@@ -8,10 +8,13 @@ reset:
   sta $6000
 
 loop:
+  jsr rotate
+  jmp loop
+
+rotate:
   ror
   sta $6000
-
-  jmp loop
+  rts
 
   .org $fffc
   .word reset
