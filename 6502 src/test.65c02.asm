@@ -1,19 +1,24 @@
   .org $8000
 
+PORTB = $6000
+PORTA = $6001
+DDRB = $6002
+DDRA = $6003
+
 reset:
   lda #$ff
-  sta $6002
+  sta PORTB
 
   lda #$50
-  sta $6000
+  sta PORTB
 
-loop:
+repeat:
   jsr rotate
-  jmp loop
+  jmp repeat
 
 rotate:
   ror
-  sta $6000
+  sta PORTB
   rts
 
   .org $fffc

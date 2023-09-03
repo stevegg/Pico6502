@@ -2,4 +2,5 @@
   (version 7)
   (lib (name "MCU_RaspberryPi_and_Boards")(type "KiCad")(uri "C:/Users/steve/OneDrive/Documents/PlatformIO/Projects/Pico6502/hardware/KiCad-RP-Pico/RP-Pico Libraries/MCU_RaspberryPi_and_Boards.kicad_sym")(options "")(descr ""))
   (lib (name "65xx-library")(type "KiCad")(uri "C:/Users/steve/OneDrive/Documents/PlatformIO/Projects/Pico6502/hardware/6502-kicad-library/symbols/65xx-library.kicad_sym")(options "")(descr ""))
+  (lib (name "6502")(type "KiCad")(uri "${KIPRJMOD}/6502.kicad_sym")(options "")(descr ""))
 )
