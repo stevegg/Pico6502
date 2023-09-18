@@ -404,7 +404,7 @@
         (name "RS1" (effects (font (size 1.27 1.27))))
         (number "14" (effects (font (size 1.27 1.27))))
       )
-      (pin power_in line (at 12.668 -16.5538 180) (length 2.54)
+      (pin power_in line (at 12.7 -16.51 180) (length 2.54)
         (name "VCC" (effects (font (size 1.27 1.27))))
         (number "15" (effects (font (size 1.27 1.27))))
       )
