@@ -1,0 +1,15 @@
+GAL16V8    ;
+Decode     ;
+
+A15  A14  A13  A12  A11      A10     IOSELIN RW      CLK     GND
+NC   NC   NC   NC   ACIASEL  6522SEL IOSEL   RAMSEL  ROMSEL  VCC     
+
+
+/ROMSEL   =  A15
+/RAMSEL   =  A15 * CLK
+/IOSEL    =  A15 * A14
+/ACIASEL  =  /IOSELIN * /A13 * A12
+/6522SEL  =  /IOSELIN * A13
+
+DESCRIPTION
+
